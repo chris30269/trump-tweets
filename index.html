@@ -8,6 +8,7 @@
 	<div id="tooltip"><p>Hi I'm a tooltip how are you?</p></div>
 </body>
 <script type="text/javascript">
+	//fox and friends in on 6am - 9am
 	var margin = {
         "left":40,
         "right":20,
@@ -41,14 +42,16 @@
     			}
     		};
     	});
-    	console.log(JSON.stringify(tweetsInHour));
+    	// console.log(JSON.stringify(tweetsInHour));
     	var max = d3.max(tweetsInHour, function(d) { return +d.tweets;} );
-    	console.log("max", max);
+    	// console.log("max", max);
     	y.domain([0, max]);
     	// console.log("y.domain", y.domain);
+    	// var xAxis = d3.axisBottom(x).tickValues(["12am", "1am", "2am", "3am", "4am", "5am", "6am", "7am", "8am", "9am", "10am", "11am", "12pm", "1am", "2am", "3am", "4am", "5am", "6am", "7am", "8am", "9am", "10am", "11am"]);
+    	var xAxis = d3.axisBottom(x);
 		svg.append("g")
 	      .attr("transform", "translate(0," + (height-margin.bottom) + ")")
-	      .call(d3.axisBottom(x));
+	      .call(xAxis);
 	    svg.append("g")
 		    .attr("transform", "translate("+ margin.left +", 0)")
 	      .call(d3.axisLeft(y));
@@ -59,8 +62,9 @@
 	          .attr("class", "bar")
 	          .attr("x", function(d){return x(d.hour);})
 	          .attr("width", barWidth)
-	          .attr("y", function(d, i){return y(d.tweets);})
-	          .attr("height", function(d, i){return height - y(d.tweets) - margin.bottom;});
+	          .attr("y", function(d){return y(d.tweets);})
+	          .attr("height", function(d){return height - y(d.tweets) - margin.bottom;})
+	          .attr("fill", function(d){if(d.hour == 6 || d.hour == 7 || d.hour == 8) return "orange";});
     });
 
 </script>
