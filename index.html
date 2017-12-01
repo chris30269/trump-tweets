@@ -1,0 +1,66 @@
+<html>
+<head>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+	<h1>Trump's Tweets throughout the Day</h1>
+	<svg></svg>
+	<div id="tooltip"><p>Hi I'm a tooltip how are you?</p></div>
+</body>
+<script type="text/javascript">
+	var margin = {
+        "left":40,
+        "right":20,
+        "top":20,
+        "bottom":20,
+    };
+    var width = window.innerWidth*0.9;
+    var height = window.innerHeight*0.9;
+    var barWidth = (width-margin.left-margin.right)/24;
+
+    var x = d3.scaleBand()
+    	.range([margin.left, width-margin.right])
+    	.domain([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]);
+	var y = d3.scaleLinear().range([height-margin.bottom, margin.top]);
+	var tweetsInHour = [];
+	for (var i = 24 - 1; i >= 0; i--) {
+		tweetsInHour[i] = {"hour":i, "tweets":0};
+	};
+
+    var svg = d3.select("svg")
+        .attr("height", height)
+        .attr("width", width);
+
+    d3.json("archive/data/realdonaldtrump/2017.json", function(error, data){
+    	data.forEach(function(d){
+    		//Fri Dec 01 11:21:06 +0000 2017
+    		d.created_at = new Date(d.created_at).getHours();
+    		for (var i = tweetsInHour.length - 1; i >= 0; i--) {
+    			if(tweetsInHour[i].hour == d.created_at){
+    				tweetsInHour[i].tweets++;
+    			}
+    		};
+    	});
+    	console.log(JSON.stringify(tweetsInHour));
+    	var max = d3.max(tweetsInHour, function(d) { return +d.tweets;} );
+    	console.log("max", max);
+    	y.domain([0, max]);
+    	// console.log("y.domain", y.domain);
+		svg.append("g")
+	      .attr("transform", "translate(0," + (height-margin.bottom) + ")")
+	      .call(d3.axisBottom(x));
+	    svg.append("g")
+		    .attr("transform", "translate("+ margin.left +", 0)")
+	      .call(d3.axisLeft(y));
+
+	    svg.selectAll("bar")
+	        .data(tweetsInHour)
+	        .enter().append("rect")
+	          .attr("class", "bar")
+	          .attr("x", function(d){return x(d.hour);})
+	          .attr("width", barWidth)
+	          .attr("y", function(d, i){return y(d.tweets);})
+	          .attr("height", function(d, i){return height - y(d.tweets) - margin.bottom;});
+    });
+
+</script>
